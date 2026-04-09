@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | BookStore Pro</title>
+    <style>
+        /* Shared Styles */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
+        
+        .navbar { position: absolute; top: 0; width: 100%; background: #2c3e50; color: white; padding: 15px; text-align: center; }
+        .navbar a { color: white; text-decoration: none; margin: 0 15px; }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        h2 { margin-bottom: 20px; color: #333; }
+
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #555; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+
+        /* Indian Mobile Input Group */
+        .mobile-group { display: flex; }
+        .mobile-prefix { background: #eee; padding: 10px; border: 1px solid #ccc; border-right: 0; border-radius: 4px 0 0 4px; color: #555; font-weight: bold; }
+        .mobile-input { border-radius: 0 4px 4px 0; }
+
+        .btn-register { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-register:hover { background: #219150; }
+
+        .login-link { margin-top: 20px; font-size: 14px; }
+        .login-link a { color: #3498db; text-decoration: none; font-weight: bold; }
+        .login-link a:hover { text-decoration: underline; }
+
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <strong>BookStore Pro</strong>
+        <a href="index.html">Home</a>
+    </div>
+
+    <div class="auth-card">
+        <h2>Create Account</h2>
+        
+        <form action="profile.html"> <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" placeholder="First and Last name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <div class="mobile-group">
+                    <span class="mobile-prefix">+91</span>
+                    <input type="tel" class="mobile-input" placeholder="Mobile number" maxlength="10" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email (Optional)</label>
+                <input type="email">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" placeholder="At least 6 characters" required>
+                <small style="color: #777; font-size: 11px;">Passwords must be at least 6 characters.</small>
+            </div>
+
+            <button type="submit" class="btn-register">Verify Mobile Number</button>
+            
+            <div style="margin-top: 15px; font-size: 12px; color: #666;">
+                By creating an account, you agree to BookStore's Conditions of Use and Privacy Notice.
+            </div>
+
+        </form>
+
+        <div class="divider" style="border-top: 1px solid #eee; margin: 20px 0;"></div>
+
+        <div class="login-link">
+            Already have an account? 
+            <a href="login.html">Sign in ></a>
+        </div>
+    </div>
+
+</body>
+</html>

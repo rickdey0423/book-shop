@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment | BookStore Pro</title>
+    <style>
+        /* --- GLOBAL RESET --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f3f6; color: #212121; }
+        a { text-decoration: none; color: inherit; }
+
+        /* Navbar */
+        .navbar {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 { font-size: 24px; font-weight: bold; }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            display: flex;
+            gap: 20px;
+            padding: 0 10px;
+            align-items: flex-start;
+        }
+
+        /* LEFT SIDE */
+        .payment-section {
+            flex: 2;
+            background: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            background-color: #2874f0;
+            color: white;
+            padding: 15px 24px;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .option-group { border-bottom: 1px solid #f0f0f0; }
+        
+        .option-header {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .option-header:hover { background-color: #f9f9f9; }
+        .option-header input[type="radio"] { margin-right: 15px; accent-color: #2874f0; transform: scale(1.2); }
+        .option-label { font-size: 16px; font-weight: 500; }
+        
+        .option-content { padding: 0 24px 20px 54px; display: none; }
+        .option-group.active .option-content { display: block; }
+        .option-group.active .option-header { background-color: #f5faff; }
+
+        /* QR Code Styles */
+        .qr-container {
+            text-align: center;
+            background-color: #f8f9fa;
+            border: 1px dashed #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 380px;
+            margin-top: 10px;
+        }
+        .merchant-name { font-size: 18px; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
+        .upi-badge {
+            background: #fff; border: 1px solid #ddd; padding: 8px 15px; 
+            border-radius: 20px; font-size: 14px; display: inline-block; margin-top: 10px;
+            color: #555; font-family: monospace;
+        }
+        .qr-img { width: 200px; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .scan-instruction { font-size: 13px; color: #777; margin-top: 10px; }
+
+        /* Inputs & Buttons */
+        .txn-input-area { margin-top: 20px; text-align: left; border-top: 1px solid #ddd; padding-top: 15px; }
+        .txn-label { font-size: 14px; font-weight: bold; color: #333; display: block; margin-bottom: 5px; }
+        .txn-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin-bottom: 5px; }
+        .timer-text { font-size: 13px; color: #d32f2f; font-weight: bold; margin-bottom: 10px; }
+
+        .btn-pay {
+            background-color: #fb641b; color: white; border: none; padding: 14px 40px;
+            font-size: 16px; font-weight: bold; text-transform: uppercase; border-radius: 2px;
+            cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.2); margin-top: 10px; width: 100%;
+        }
+        .btn-pay:hover { background-color: #f4511e; }
+        .btn-pay:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .loader {
+            border: 4px solid #f3f3f3; border-top: 4px solid #3498db;
+            border-radius: 50%; width: 20px; height: 20px;
+            animation: spin 1s linear infinite; display: inline-block;
+            vertical-align: middle; margin-right: 10px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* RIGHT SIDE: PRICE DETAILS */
+        .price-sidebar {
+            flex: 1;
+            background: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            border-radius: 2px;
+            height: fit-content;
+        }
+        .price-header { padding: 13px 24px; border-bottom: 1px solid #f0f0f0; color: #878787; font-weight: 500; font-size: 14px; text-transform: uppercase; }
+        .price-body { padding: 20px 24px; }
+        .price-row-item { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px; }
+        .price-row-total { 
+            display: flex; justify-content: space-between; 
+            border-top: 1px dashed #e0e0e0; border-bottom: 1px dashed #e0e0e0; 
+            padding: 20px 0; font-size: 18px; font-weight: bold; margin-bottom: 20px;
+        }
+        .green-text { color: #388e3c; }
+    </style>
+</head>
+<body onload="initPage()">
+
+    <div class="navbar">
+        <h1>BookStore Pro</h1>
+        <div style="color: #ecf0f1; font-size: 14px;">100% Secure Payments</div>
+    </div>
+
+    <div class="container">
+        
+        <div class="payment-section">
+            <div class="section-header">Payment Options</div>
+
+            <div class="option-group active" id="opt-upi">
+                <div class="option-header" onclick="selectOption('opt-upi')">
+                    <input type="radio" name="payment" checked>
+                    <span class="option-label">UPI / QR Code</span>
+                </div>
+                <div class="option-content" style="display: block;"> 
+                    <div class="qr-container">
+                        <div class="merchant-name">Merchant: Gautam Pal</div>
+                        
+                        <img src="my-qr-code.jpeg" alt="Scan to Pay" class="qr-img">
+                        
+                        <div class="upi-badge">UPI ID: gautam200433@axl</div>
+                        
+                        <p class="scan-instruction">Scan to pay <strong id="upi-amount-display">₹...</strong></p>
+
+                        <div class="txn-input-area">
+                            <label class="txn-label">Step 2: Enter Transaction ID / UTR</label>
+                            <input type="text" id="txnId" class="txn-input" placeholder="e.g. 302412345678" maxlength="12">
+                            <div class="timer-text" id="timerDisplay">Time Remaining: 05:00</div>
+                            <button class="btn-pay" id="verifyBtn" onclick="verifyAndPay()">VERIFY & PAY</button>
+                            <div id="statusMsg" style="margin-top: 10px; font-size: 14px; font-weight: bold;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="option-group" id="opt-wallet">
+                <div class="option-header" onclick="selectOption('opt-wallet')">
+                    <input type="radio" name="payment">
+                    <span class="option-label">Wallets</span>
+                </div>
+                <div class="option-content">
+                    <input type="radio" name="wallet" checked> <label>Paytm Wallet</label> <br><br>
+                    <button class="btn-pay pay-btn-dynamic" onclick="window.location.href='confirmation.html'">PAY</button>
+                </div>
+            </div>
+
+            <div class="option-group" id="opt-card">
+                <div class="option-header" onclick="selectOption('opt-card')">
+                    <input type="radio" name="payment">
+                    <span class="option-label">Credit / Debit / ATM Card</span>
+                </div>
+                <div class="option-content">
+                    <input type="text" placeholder="Enter Card Number">
+                    <div style="display: flex; gap: 10px; width: 60%;">
+                        <input type="text" placeholder="MM/YY">
+                        <input type="password" placeholder="CVV">
+                    </div>
+                    <button class="btn-pay pay-btn-dynamic" onclick="window.location.href='confirmation.html'">PAY</button>
+                </div>
+            </div>
+
+            <div class="option-group" id="opt-cod">
+                <div class="option-header" onclick="selectOption('opt-cod')">
+                    <input type="radio" name="payment">
+                    <span class="option-label">Cash on Delivery</span>
+                </div>
+                <div class="option-content">
+                    <p style="font-size: 14px; margin-bottom: 10px;">Pay via Cash or UPI at time of delivery.</p>
+                    <div style="background: #fdf8e4; padding: 10px; border: 1px dashed #e6c100; font-size: 13px; margin-bottom: 10px; width: fit-content;">
+                        Enter characters shown: <strong>5 8 2 1</strong>
+                    </div>
+                    <input type="text" placeholder="Enter Captcha" style="width: 150px;">
+                    <br>
+                    <button class="btn-pay" onclick="window.location.href='confirmation.html'">CONFIRM ORDER</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="price-sidebar">
+            <div class="price-header">PRICE DETAILS</div>
+            <div class="price-body">
+                <div class="price-row-item">
+                    <span>Price (<span id="total-items">0</span> items)</span>
+                    <span id="subtotal-display">₹0</span>
+                </div>
+                <div class="price-row-item">
+                    <span>Delivery Charges</span>
+                    <span class="green-text">FREE</span>
+                </div>
+                
+                <div class="price-row-total">
+                    <span>Total Payable</span>
+                    <span id="final-total-display">₹0</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. Initialize Page (Load Price & Start Timer)
+        function initPage() {
+            calculateTotal();
+            startTimer();
+        }
+
+        // 2. Calculate Total from LocalStorage
+        function calculateTotal() {
+            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+            let totalPrice = 0;
+            let totalQty = 0;
+
+            cart.forEach(book => {
+                let qty = book.quantity || 1;
+                // Clean price string to number
+                let priceValue = parseInt(String(book.price).replace(/[^0-9]/g, ''));
+                totalPrice += (priceValue * qty);
+                totalQty += qty;
+            });
+
+            let formattedPrice = "₹" + totalPrice.toLocaleString('en-IN');
+
+            // Update Right Sidebar
+            document.getElementById('subtotal-display').innerText = formattedPrice;
+            document.getElementById('final-total-display').innerText = formattedPrice;
+            document.getElementById('total-items').innerText = totalQty;
+
+            // Update UPI Instruction Text
+            document.getElementById('upi-amount-display').innerText = formattedPrice;
+
+            // Update All "PAY" Buttons
+            let payButtons = document.getElementsByClassName('pay-btn-dynamic');
+            for(let btn of payButtons) {
+                btn.innerText = "PAY " + formattedPrice;
+            }
+        }
+
+        // 3. Accordion Logic
+        function selectOption(id) {
+            var contents = document.getElementsByClassName('option-content');
+            for (var i = 0; i < contents.length; i++) contents[i].style.display = 'none';
+            
+            var groups = document.getElementsByClassName('option-group');
+            for (var i = 0; i < groups.length; i++) groups[i].classList.remove('active');
+
+            var selectedGroup = document.getElementById(id);
+            selectedGroup.classList.add('active');
+            selectedGroup.querySelector('.option-content').style.display = 'block';
+            selectedGroup.querySelector('input[type="radio"]').checked = true;
+        }
+
+        // 4. Timer Logic
+        var timeLeft = 300; 
+        var timerInterval;
+        function startTimer() {
+            timerInterval = setInterval(function() {
+                var minutes = Math.floor(timeLeft / 60);
+                var seconds = timeLeft % 60;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                document.getElementById("timerDisplay").innerText = "Time Remaining: " + minutes + ":" + seconds;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById("timerDisplay").innerText = "Time Expired.";
+                    document.getElementById("verifyBtn").disabled = true;
+                } else {
+                    timeLeft--;
+                }
+            }, 1000);
+        }
+
+        // 5. Verification Logic
+        function verifyAndPay() {
+            var txnId = document.getElementById("txnId").value;
+            var btn = document.getElementById("verifyBtn");
+            var status = document.getElementById("statusMsg");
+
+            if (txnId.trim() === "") { alert("Please enter Transaction ID"); return; }
+            if (txnId.length < 12) { alert("Invalid Transaction ID"); return; }
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loader"></div> Verifying...';
+            status.style.color = "blue";
+            status.innerText = "Please wait...";
+
+            setTimeout(function() {
+                status.style.color = "green";
+                status.innerText = "Payment Successful!";
+                btn.innerHTML = "Redirecting...";
+                setTimeout(function() { window.location.href = "confirmation.html"; }, 1000);
+            }, 3000);
+        }
+    </script>
+
+</body>
+</html>

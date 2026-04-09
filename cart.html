@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart | BookStore Pro</title>
+    <style>
+        /* --- CSS STYLES --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f3f6; color: #212121; }
+        a { text-decoration: none; color: inherit; }
+
+        /* Navbar */
+        .navbar {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .navbar h1 { font-size: 24px; font-weight: bold; }
+
+        /* Cart Layout */
+        .cart-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            display: flex;
+            gap: 20px;
+            padding: 0 10px;
+            align-items: flex-start;
+        }
+
+        /* LEFT SIDE: ITEMS */
+        .cart-items-section {
+            flex: 2;
+            background: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            min-height: 300px;
+        }
+        
+        .cart-header { padding: 15px 24px; border-bottom: 1px solid #f0f0f0; font-size: 18px; font-weight: 500; }
+
+        .cart-item {
+            display: flex;
+            padding: 24px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+        .item-img-box { width: 110px; height: 110px; text-align: center; margin-right: 24px; }
+        .item-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        .item-details { flex: 1; }
+        .item-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; display: block; }
+        
+        .price-row { margin-bottom: 10px; display: flex; align-items: baseline; }
+        .current-price { font-size: 18px; font-weight: bold; color: #212121; margin-right: 10px; }
+        
+        /* NEW: Quantity Button Styles */
+        .qty-control { display: flex; align-items: center; margin-top: 15px; }
+        .qty-btn { 
+            width: 28px; height: 28px; border-radius: 50%; border: 1px solid #c2c2c2; 
+            background: white; cursor: pointer; font-weight: bold; font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .qty-btn:hover { background-color: #f0f0f0; }
+        .qty-display { 
+            width: 40px; text-align: center; font-size: 14px; border: 1px solid #c2c2c2; 
+            margin: 0 8px; padding: 4px; background: #fff;
+        }
+
+        .action-link { font-size: 14px; font-weight: 500; color: #212121; margin-left: 25px; cursor: pointer; text-transform: uppercase; }
+        .action-link:hover { color: #2874f0; }
+
+        /* RIGHT SIDE: PRICE DETAILS */
+        .price-sidebar {
+            flex: 1;
+            background: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            border-radius: 2px;
+            height: fit-content;
+            position: sticky; top: 80px; 
+        }
+        .price-header { padding: 13px 24px; border-bottom: 1px solid #f0f0f0; color: #878787; font-weight: 500; font-size: 14px; text-transform: uppercase; }
+        
+        .price-body { padding: 20px 24px; }
+        .price-row-item { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px; }
+        .price-row-total { 
+            display: flex; justify-content: space-between; 
+            border-top: 1px dashed #e0e0e0; border-bottom: 1px dashed #e0e0e0; 
+            padding: 20px 0; font-size: 18px; font-weight: bold; margin-bottom: 20px;
+        }
+        .green-text { color: #388e3c; }
+
+        .btn-place-order {
+            background-color: #fb641b; 
+            color: white;
+            border: none;
+            padding: 14px 50px;
+            font-size: 16px;
+            font-weight: 500;
+            text-transform: uppercase;
+            border-radius: 2px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .empty-cart-msg {
+            text-align: center; padding: 50px; font-size: 18px; color: #555;
+        }
+    </style>
+</head>
+<body onload="loadCart()">
+
+    <div class="navbar">
+        <h1>BookStore Pro</h1>
+        <a href="catalog.html" style="color: white; text-decoration: none;">Continue Shopping</a>
+    </div>
+
+    <div class="cart-container">
+        
+        <div class="cart-items-section">
+            <div class="cart-header">My Cart (<span id="header-count">0</span>)</div>
+
+            <div id="cart-list"></div>
+            
+            <div id="place-order-section" style="padding: 16px 24px; background: white; border-top: 1px solid #f0f0f0; text-align: right; display: none;">
+                <form action="payment.html">
+                    <button class="btn-place-order">PLACE ORDER</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="price-sidebar">
+            <div class="price-header">PRICE DETAILS</div>
+            <div class="price-body">
+                <div class="price-row-item">
+                    <span>Price (<span id="total-items">0</span> items)</span>
+                    <span id="subtotal">₹0</span>
+                </div>
+                <div class="price-row-item">
+                    <span>Delivery Charges</span>
+                    <span class="green-text">FREE</span>
+                </div>
+                
+                <div class="price-row-total">
+                    <span>Total Amount</span>
+                    <span id="final-total">₹0</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function loadCart() {
+            let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+            let container = document.getElementById('cart-list');
+            let totalPrice = 0;
+            let totalQty = 0;
+
+            container.innerHTML = "";
+
+            // Check if empty
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart-msg">
+                        Your cart is empty! <br><br>
+                        <a href="catalog.html" style="color:#2874f0; font-weight:bold;">Shop Now</a>
+                    </div>
+                `;
+                document.getElementById('place-order-section').style.display = 'none';
+                updateSummary(0, 0);
+                return;
+            }
+
+            document.getElementById('place-order-section').style.display = 'block';
+
+            cart.forEach((book, index) => {
+                // If book doesn't have quantity yet, set it to 1
+                if (!book.quantity) {
+                    book.quantity = 1;
+                }
+
+                // Clean price string to number
+                let priceValue = parseInt(String(book.price).replace(/[^0-9]/g, ''));
+                
+                // Calculate item total
+                totalPrice += (priceValue * book.quantity);
+                totalQty += book.quantity;
+
+                let itemHTML = `
+                    <div class="cart-item">
+                        <div class="item-img-box">
+                            <img src="${book.img}" class="item-img" alt="Book">
+                        </div>
+                        <div class="item-details">
+                            <span class="item-title">${book.title}</span>
+                            
+                            <div class="price-row">
+                                <span class="current-price">₹${priceValue.toLocaleString('en-IN')}</span>
+                            </div>
+                            
+                            <div class="delivery-txt" style="font-size: 12px; margin-bottom: 10px;">Delivery by <span class="green-text">Free</span></div>
+
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
+                                <input type="text" class="qty-display" value="${book.quantity}" readonly>
+                                <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+                                
+                                <div class="action-link" onclick="removeItem(${index})">REMOVE</div>
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += itemHTML;
+            });
+
+            // Save updated quantities back to storage (in case we set defaults)
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            
+            updateSummary(totalPrice, totalQty);
+        }
+
+        // Logic for + and - Buttons
+        function changeQty(index, change) {
+            let cart = JSON.parse(localStorage.getItem('myCart'));
+            
+            // Apply change
+            cart[index].quantity = (cart[index].quantity || 1) + change;
+
+            // Prevent quantity going below 1
+            if (cart[index].quantity < 1) {
+                cart[index].quantity = 1;
+            }
+
+            // Save and Reload
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        // Remove Logic
+        function removeItem(index) {
+            let cart = JSON.parse(localStorage.getItem('myCart'));
+            cart.splice(index, 1);
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        // Update Summary Area
+        function updateSummary(price, qty) {
+            document.getElementById('subtotal').innerText = "₹" + price.toLocaleString('en-IN');
+            document.getElementById('final-total').innerText = "₹" + price.toLocaleString('en-IN');
+            document.getElementById('total-items').innerText = qty;
+            document.getElementById('header-count').innerText = qty;
+        }
+    </script>
+
+</body>
+</html>

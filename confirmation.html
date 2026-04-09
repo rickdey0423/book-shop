@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | BookStore Pro</title>
+    <style>
+        /* --- GLOBAL RESET --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f3f6; color: #212121; }
+        a { text-decoration: none; color: inherit; }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 { font-size: 24px; font-weight: bold; }
+        .nav-links a { color: white; margin-left: 20px; font-size: 14px; }
+
+        /* --- CONFIRMATION CONTAINER --- */
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        /* Success Animation/Icon */
+        .success-icon {
+            color: #388e3c; /* Green */
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        .order-title { font-size: 26px; font-weight: bold; color: #388e3c; margin-bottom: 10px; }
+        .order-subtitle { font-size: 16px; color: #555; margin-bottom: 30px; }
+
+        /* --- ORDER DETAILS BOX --- */
+        .details-box {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 30px;
+            background-color: #f9f9f9;
+        }
+        
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        .details-row:last-child { border-bottom: none; }
+        
+        .label { color: #878787; font-size: 14px; }
+        .value { font-weight: 500; color: #212121; font-size: 15px; }
+
+        /* Address Section */
+        .address-section {
+            text-align: left;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .address-title { font-weight: bold; margin-bottom: 5px; font-size: 16px; }
+        .address-text { font-size: 14px; color: #555; line-height: 1.5; }
+
+        /* --- BUTTONS --- */
+        .btn-group { display: flex; justify-content: center; gap: 20px; margin-top: 30px; }
+
+        .btn-primary {
+            background-color: #2874f0;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 2px;
+            font-weight: bold;
+            font-size: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .btn-primary:hover { background-color: #1a5ac6; }
+
+        .btn-secondary {
+            background-color: white;
+            color: #2874f0;
+            padding: 12px 30px;
+            border-radius: 2px;
+            font-weight: bold;
+            font-size: 15px;
+            border: 1px solid #2874f0;
+        }
+        .btn-secondary:hover { background-color: #f5faff; }
+
+        /* Footer small text */
+        .footer-note { font-size: 12px; color: #999; margin-top: 40px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <h1>BookStore Pro</h1>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="profile.html">My Account</a>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <div class="success-icon">✓</div>
+        
+        <div class="order-title">Order Placed Successfully!</div>
+        <p class="order-subtitle">Thank you for your purchase. A confirmation email has been sent to <strong>rahul***@gmail.com</strong></p>
+
+        <div class="details-box">
+            <div class="details-row">
+                <span class="label">Order ID</span>
+                <span class="value">#OD1234567890</span>
+            </div>
+            <div class="details-row">
+                <span class="label">Order Date</span>
+                <span class="value" id="date-display">04 Feb 2026</span>
+            </div>
+            <div class="details-row">
+                <span class="label">Total Amount</span>
+                <span class="value">₹1,530</span>
+            </div>
+            <div class="details-row">
+                <span class="label">Payment Mode</span>
+                <span class="value" style="color: green;">Verified & Prepaid</span>
+            </div>
+            <div class="details-row">
+                <span class="label">Estimated Delivery</span>
+                <span class="value">By Monday, 09 Feb 2026</span>
+            </div>
+
+            <div class="address-section">
+                <div class="address-title">Delivery Address</div>
+                <div class="address-text">
+                    <strong>Rahul Sharma</strong> <br>
+                    Flat 304, Green Valley Apartments, Sector 62, <br>
+                    Noida, Uttar Pradesh - 201309 <br>
+                    Ph: +91 98765 43210
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <a href="catalog.html" class="btn-primary">Continue Shopping</a>
+            <button class="btn-secondary" onclick="alert('Downloading Invoice PDF...')">Download Invoice</button>
+        </div>
+
+        <div class="footer-note">
+            Need help? <a href="#" style="color:#2874f0">Contact Support</a>
+        </div>
+
+    </div>
+
+    <script>
+        // Simple script to set today's date automatically
+        var today = new Date();
+        var options = { day: 'numeric', month: 'short', year: 'numeric' };
+        document.getElementById('date-display').innerText = today.toLocaleDateString('en-IN', options);
+    </script>
+
+</body>
+</html>
